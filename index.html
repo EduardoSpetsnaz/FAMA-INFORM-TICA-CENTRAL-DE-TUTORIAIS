@@ -48,13 +48,13 @@ dialog{border:1px solid var(--line);border-radius:14px;background:var(--wrapbg);
 dialog::backdrop{background:#000a}
 .dlg{padding:16px}.dlg h3{margin:0 0 12px;font-size:1.15em}
 .dlg label{display:block;font-size:.86em;color:var(--muted);margin:10px 0 4px}
-.dlg input[type=text],.dlg select,.dlg textarea{width:100%;padding:9px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
+.dlg input[type=text],.dlg input[type=file],.dlg select,.dlg textarea{width:100%;padding:9px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
 .dlg input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:2px}
 .dlg textarea{min-height:70px;resize:vertical}
 .dlg video{width:100%;max-height:60vh;background:#000;border-radius:var(--r)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-.tabs{display:flex;gap:6px;margin-bottom:6px}
-.tabs .btn{flex:1}.tabs .on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.tabs .btn{flex:1;min-width:110px}.tabs .on{background:var(--blue);color:#fff;border-color:var(--blue)}
 .catrow{display:grid;grid-template-columns:54px 1fr 1.4fr auto;gap:6px;margin-top:8px;align-items:center}
 .catrow input{width:100%;padding:8px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
 .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
@@ -67,6 +67,10 @@ dialog::backdrop{background:#000a}
 .gbox .logo{margin:0 auto 10px;background:var(--navy);color:#fff;width:46px}
 .hbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;font-size:.86em}
 .rowr{display:flex;gap:6px;flex-wrap:wrap}
+.sug{position:absolute;left:0;right:0;top:44px;z-index:20;background:var(--wrapbg);color:var(--text);border:1px solid var(--line);border-radius:var(--r);max-height:300px;overflow:auto;box-shadow:0 8px 24px #0006}
+.sugi{display:flex;gap:10px;align-items:center;padding:9px 11px;cursor:pointer;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left}
+.sugi:hover,.sugi.on{background:var(--hover)}
+.sugi small{color:var(--muted)}
 .mini{padding:7px 9px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--text);font:inherit;width:180px}
 .chead{display:flex;gap:12px;align-items:center;margin:14px 0 4px}
 .urow{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px;flex-wrap:wrap}
@@ -78,14 +82,14 @@ dialog::backdrop{background:#000a}
 <header>
   <div class="top">
     <div class="brand"><div class="logo" id="logo">▣</div><div><div id="brandName"></div><div id="brandSub"></div></div></div>
-    <div class="hbar"><span id="who"></span><button class="btn ghost small" id="cfgBtn" hidden>⚙ Configurações</button><button class="btn ghost small" id="outBtn" hidden>Sair</button></div>
+    <div class="hbar"><span id="who"></span><button class="btn ghost small" id="cfgBtn" type="button" hidden>⚙ Configurações</button><button class="btn ghost small" id="outBtn" type="button" hidden>Sair</button></div>
   </div>
   <h1 id="h1"></h1><p id="hp"></p>
-  <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Pesquisar tutorial..." aria-label="Pesquisar tutorial"></label>
+  <div style="position:relative"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Pesquisar vídeo ou tutorial..." aria-label="Pesquisar tutorial" autocomplete="off"></label><div id="sug" class="sug" hidden></div></div>
 </header>
 <main>
   <div id="catSection">
-    <div class="row"><h2 class="section-title">Categorias de tutoriais</h2><div class="rowr"><input type="search" id="catSearch" class="mini" placeholder="Pesquisar categoria..." aria-label="Pesquisar categoria"><button class="btn small" id="newCatBtn" hidden>+ Nova categoria</button></div></div>
+    <div class="row"><h2 class="section-title">Categorias de tutoriais</h2><div class="rowr"><input type="search" id="catSearch" class="mini" placeholder="Pesquisar categoria..." aria-label="Pesquisar categoria"><button class="btn small" id="newCatBtn" type="button" hidden>+ Nova categoria</button></div></div>
     <div class="categories" id="categories"></div>
   </div>
   <div id="catHead" hidden>
@@ -93,7 +97,7 @@ dialog::backdrop{background:#000a}
     <div class="chead"><span class="ico" id="chIcon" style="font-size:30px"></span><div><h2 id="chName" style="margin:0"></h2><p id="chDesc" class="status" style="margin:4px 0 0"></p></div></div>
   </div>
   <div class="tutorials">
-    <div class="row"><h2 id="tutTitle">Últimos tutoriais</h2><button class="btn" id="addBtn" hidden>+ Enviar vídeo</button></div>
+    <div class="row"><h2 id="tutTitle">Últimos tutoriais</h2><button class="btn" id="addBtn" type="button" hidden>+ Enviar vídeo</button></div>
     <div class="tutorial-list" id="list"></div>
     <div class="msg" id="msg">Carregando tutoriais…</div>
   </div>
@@ -142,7 +146,12 @@ dialog::backdrop{background:#000a}
 
 <dialog id="cfgDlg"><div class="dlg">
   <h3>Configurações do site</h3>
-  <div class="tabs"><button class="btn ghost on" id="tabA" type="button">Aparência</button><button class="btn ghost" id="tabB" type="button">Textos</button><button class="btn ghost" id="tabC" type="button">Categorias</button><button class="btn ghost" id="tabD" type="button">Usuários</button></div>
+  <div class="tabs">
+    <button class="btn ghost on" id="tabA" type="button">Aparência</button>
+    <button class="btn ghost" id="tabB" type="button">Textos</button>
+    <button class="btn ghost" id="tabC" type="button">Categorias</button>
+    <button class="btn ghost" id="tabD" type="button">Usuários</button>
+  </div>
   <div id="paneA">
     <div class="grid2">
       <div><label for="sNavy">Cor do cabeçalho</label><input type="color" id="sNavy"></div>
@@ -187,46 +196,95 @@ const $=id=>document.getElementById(id);
 const DEF={name:"FAMA INFORMÁTICA",sub:"CENTRAL DE TUTORIAIS",h1:"Aprenda a utilizar seu sistema",p:"Encontre tutoriais e soluções para suas dúvidas.",footer:"Fama Informática • Suporte e treinamento para nossos clientes",logo:"▣",navy:"#15385f",accent:"#1685ed",font:"Arial,Helvetica,sans-serif",size:14,radius:8,theme:"dark"};
 const DEFCATS=[["🖥️","Sistema SCE","Instalação e utilização"],["📄","Notas fiscais","NF-e e NFC-e"],["💾","Backup","Cópias e restauração"],["📦","Cadastros","Produtos e clientes"],["💰","Financeiro","Contas e pagamentos"],["❓","Dúvidas frequentes","Problemas e soluções"]].map((c,i)=>({id:"d"+i,icon:c[0],name:c[1],desc:c[2],order:i,isDefault:true}));
 
-let items=[],cats=[],S={...DEF},selected="",current=null,draft=[],removed=[];
-let me=null,users=[],isMaster=false,setupMode=false,ready=false;
+/* Estado da aplicação e adaptador local (usado quando db/assets externos não são injetados) */
+let db=null,assets=null,items=[],cats=[],S={...DEF},selected="",current=null,draft=[],removed=[];
+let me=null,users=[],isMaster=false,userCap=null,setupMode=false,activeBlobUrl="";
 
-/* Armazenamento local: localStorage para dados/configurações e IndexedDB para vídeos */
-const LS={
-  get(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb}catch(e){return fb}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-};
-function openVideoDB(){
-  return new Promise((res,rej)=>{
-    const req=indexedDB.open("fama_videos_db",1);
-    req.onupgradeneeded=()=>req.result.createObjectStore("videos",{keyPath:"id"});
-    req.onsuccess=()=>res(req.result);
-    req.onerror=()=>rej(req.error);
-  });
+const STORE_KEY="fama_tuts_local_v1";
+function readLocal(){
+  try{return JSON.parse(localStorage.getItem(STORE_KEY)||"{}")}catch(e){return {}}
 }
-async function saveVideoBlob(id,file){
-  const idb=await openVideoDB();
-  return new Promise((res,rej)=>{
-    const tx=idb.transaction("videos","readwrite");
-    tx.objectStore("videos").put({id,blob:file,type:file.type});
-    tx.oncomplete=()=>res(id);
-    tx.onerror=()=>rej(tx.error);
-  });
-}
-async function getVideoUrl(id){
-  const idb=await openVideoDB();
-  return new Promise((res,rej)=>{
-    const tx=idb.transaction("videos","readonly");
-    const req=tx.objectStore("videos").get(id);
-    req.onsuccess=()=>res(req.result&&req.result.blob?URL.createObjectURL(req.result.blob):"");
-    req.onerror=()=>rej(req.error);
-  });
-}
-async function deleteVideoBlob(id){
+function writeLocal(patch){
   try{
-    const idb=await openVideoDB();
-    const tx=idb.transaction("videos","readwrite");
-    tx.objectStore("videos").delete(id);
+    const cur=readLocal();
+    localStorage.setItem(STORE_KEY,JSON.stringify({...cur,...patch}));
   }catch(e){}
+}
+function createLocalFallback(){
+  const blobStore=new Map();
+  const listeners={tutorials:new Set(),categories:new Set(),users:new Set()};
+  const notify=(col)=>{
+    const data=readLocal()[col]||{};
+    const arr=Object.entries(data).map(([id,v])=>({id,...v}));
+    listeners[col].forEach(fn=>fn({docs:arr.map(x=>({id:x.id,data:()=>({...x})}))}));
+  };
+  const localDb={
+    doc(path){
+      const [col,id]=path.split("/");
+      return {
+        async get(){
+          if(path==="settings/site"){
+            const s=readLocal().settings;
+            return {exists:!!s,data:()=>s||{}};
+          }
+          const rec=(readLocal()[col]||{})[id];
+          return {exists:!!rec,data:()=>rec||{}};
+        },
+        async set(val){
+          if(path==="settings/site"){writeLocal({settings:val});return;}
+          const all=readLocal();all[col]=all[col]||{};all[col][id]=val;writeLocal({[col]:all[col]});notify(col);
+        },
+        async update(val){
+          const all=readLocal();all[col]=all[col]||{};all[col][id]={...(all[col][id]||{}),...val};writeLocal({[col]:all[col]});notify(col);
+        },
+        async delete(){
+          const all=readLocal();all[col]=all[col]||{};delete all[col][id];writeLocal({[col]:all[col]});notify(col);
+        }
+      };
+    },
+    collection(col){
+      return {
+        async add(val){
+          const id="local_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+          const all=readLocal();all[col]=all[col]||{};all[col][id]=val;writeLocal({[col]:all[col]});notify(col);
+          return {id};
+        },
+        doc(id){return localDb.doc(col+"/"+id);},
+        limit(){
+          return {
+            async get(){
+              const rec=readLocal()[col]||{};
+              return {size:Object.keys(rec).length};
+            }
+          };
+        },
+        orderBy(field,dir="asc"){
+          return {
+            onSnapshot(cb){
+              listeners[col].add(cb);
+              const data=readLocal()[col]||{};
+              const arr=Object.entries(data).map(([id,v])=>({id,...v})).sort((a,b)=>dir==="desc"?(b[field]||0)-(a[field]||0):(a[field]||0)-(b[field]||0));
+              cb({docs:arr.map(x=>({id:x.id,data:()=>({...x})}))});
+              return ()=>listeners[col].delete(cb);
+            }
+          };
+        }
+      };
+    }
+  };
+  const localAssets={
+    async upload(file){
+      const id="vid_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+      const url=URL.createObjectURL(file);
+      blobStore.set(id,url);
+      return {id,url};
+    },
+    async delete(id){
+      const u=blobStore.get(id);
+      if(u){URL.revokeObjectURL(u);blobStore.delete(id);}
+    }
+  };
+  return {db:localDb,assets:localAssets};
 }
 
 function applySettings(){
@@ -250,8 +308,8 @@ function renderCats(){
 function render(){
   route();renderCats();
   const q=$("search").value.toLocaleLowerCase("pt-BR"),list=$("list");list.textContent="";let shown=0;
-  items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).forEach(t=>{
-    if(!((!selected||t.category===selected)&&(t.title+" "+t.category).toLocaleLowerCase("pt-BR").includes(q)))return;
+  items.forEach(t=>{
+    if(!((!selected||t.category===selected)&&match(t,q)))return;
     shown++;
     const b=document.createElement("button");b.className="tutorial";b.type="button";
     const p=document.createElement("div");p.className="play";p.textContent="▶";
@@ -260,33 +318,37 @@ function render(){
     info.append(s,sm);b.append(p,info);b.addEventListener("click",()=>openView(t));list.appendChild(b);
   });
   const m=$("msg");
-  if(!ready){m.textContent="Entre na sua conta para ver os tutoriais publicados.";m.style.display="block"}
+  if(!db){m.textContent="Entre na sua conta para ver os tutoriais publicados.";m.style.display="block"}
   else if(!shown){m.textContent=items.length?"Nenhum tutorial encontrado. Tente outra pesquisa.":"Ainda não há tutoriais publicados.";m.style.display="block"}
   else m.style.display="none";
 }
 $("search").addEventListener("input",render);
 
-async function openView(t){
-  current=t;$("vTitle").textContent=t.title;$("vDesc").textContent=t.description||"";
-  const vid=$("vVideo");
-  if(vid.dataset.objUrl){URL.revokeObjectURL(vid.dataset.objUrl);delete vid.dataset.objUrl}
-  const url=t.assetId?await getVideoUrl(t.assetId):"";
-  if(url){vid.src=url;vid.dataset.objUrl=url;$("vDesc").textContent=t.description||""}
-  else{$("vDesc").textContent=(t.description?t.description+" • ":"")+"Vídeo indisponível neste navegador."}
-  $("vDel").hidden=!isMaster;$("viewDlg").showModal();
+function openView(t){
+  current=t;
+  $("vTitle").textContent=t.title;
+  $("vDesc").textContent=t.description||"";
+  $("vVideo").src=t.url||"";
+  $("vDel").hidden=!(isMaster&&assets);
+  $("viewDlg").showModal();
 }
 function closeView(){
-  const vid=$("vVideo");vid.pause();vid.removeAttribute("src");
-  if(vid.dataset.objUrl){URL.revokeObjectURL(vid.dataset.objUrl);delete vid.dataset.objUrl}
+  $("vVideo").pause();
+  $("vVideo").removeAttribute("src");
   $("viewDlg").close();
+  current=null;
 }
 $("vClose").addEventListener("click",closeView);
+$("viewDlg").addEventListener("cancel",e=>{e.preventDefault();closeView();});
 $("vDel").addEventListener("click",async()=>{
   if(!current||!(await ask("Excluir este tutorial?")))return;
-  items=items.filter(x=>x.id!==current.id);
-  LS.set("fama_tutorials",items);
-  if(current.assetId)await deleteVideoBlob(current.assetId);
-  render();closeView();
+  $("vDel").disabled=true;
+  try{
+    await db.collection("tutorials").doc(current.id).delete();
+    if(current.assetId){try{await assets.delete(current.assetId)}catch(e){}}
+    closeView();
+  }catch(e){$("vDesc").textContent="Não foi possível excluir."}
+  $("vDel").disabled=false;
 });
 
 $("addBtn").addEventListener("click",()=>{$("uStatus").textContent="";$("uStatus").className="status";$("uTitle").value="";$("uDesc").value="";$("uFile").value="";if(selected)$("uCat").value=selected;$("uploadDlg").showModal()});
@@ -299,16 +361,46 @@ $("uSend").addEventListener("click",async()=>{
   if(f.size>20*1024*1024)return err("O vídeo passa de 20 MB. Comprima ou corte e tente de novo.");
   $("uSend").disabled=true;st.textContent="Enviando vídeo… aguarde.";
   try{
-    const assetId="vid_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
-    await saveVideoBlob(assetId,f);
-    const id="tut_"+Date.now();
-    items.push({id,title,category:$("uCat").value,description:$("uDesc").value.trim(),assetId,createdAt:Date.now()});
-    LS.set("fama_tutorials",items);
-    render();$("uploadDlg").close();
+    const a=await assets.upload(f);
+    await db.collection("tutorials").add({title,category:$("uCat").value,description:$("uDesc").value.trim(),assetId:a.id,url:a.url,createdAt:Date.now()});
+    $("uploadDlg").close();
   }catch(e){err("Falha no envio"+(e&&e.message?": "+e.message:"."))}
   $("uSend").disabled=false;
 });
 
+/* Pesquisa com sugestões */
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const match=(t,q)=>{const h=norm(t.title+" "+(t.description||"")+" "+t.category);return norm(q).split(/\s+/).filter(Boolean).every(w=>h.includes(w))};
+let sugIdx=-1,sugList=[];
+function drawSug(){
+  const q=$("search").value.trim(),box=$("sug");box.textContent="";
+  if(!q){box.hidden=true;sugList=[];return}
+  const n=norm(q);
+  sugList=items.filter(t=>match(t,q)).sort((a,b)=>(norm(b.title).startsWith(n)?1:0)-(norm(a.title).startsWith(n)?1:0)).slice(0,6);sugIdx=-1;
+  box.hidden=false;
+  if(!sugList.length){const m=document.createElement("div");m.className="msg";m.textContent="Nenhum vídeo encontrado.";box.appendChild(m);return}
+  sugList.forEach(t=>{
+    const b=document.createElement("button");b.type="button";b.className="sugi";
+    const p=document.createElement("span");p.className="play";p.textContent="▶";
+    const w=document.createElement("span");const s=document.createElement("strong");s.textContent=t.title;const sm=document.createElement("small");sm.style.display="block";sm.textContent=t.category;
+    w.append(s,sm);b.append(p,w);
+    b.addEventListener("mousedown",e=>e.preventDefault());
+    b.addEventListener("click",()=>{$("sug").hidden=true;openView(t)});
+    box.appendChild(b);
+  });
+}
+function moveSug(d){const bs=[...$("sug").querySelectorAll(".sugi")];if(!bs.length)return;sugIdx=(sugIdx+d+bs.length)%bs.length;bs.forEach((b,i)=>b.classList.toggle("on",i===sugIdx));bs[sugIdx].scrollIntoView({block:"nearest"})}
+$("search").addEventListener("input",drawSug);
+$("search").addEventListener("focus",drawSug);
+$("search").addEventListener("blur",()=>{$("sug").hidden=true});
+$("search").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();moveSug(1)}
+  else if(e.key==="ArrowUp"){e.preventDefault();moveSug(-1)}
+  else if(e.key==="Escape"){$("sug").hidden=true}
+  else if(e.key==="Enter"&&sugList.length){e.preventDefault();const t=sugList[sugIdx>=0?sugIdx:0];$("sug").hidden=true;openView(t)}
+});
+
+/* Rotas, diálogo, login e usuários */
 const slug=c=>"c-"+String(c.id).replace(/[^A-Za-z0-9]/g,"");
 function route(){
   const h=location.hash.slice(1),c=catList().find(c=>slug(c)===h);
@@ -320,75 +412,98 @@ function route(){
 window.addEventListener("hashchange",render);
 $("backBtn").addEventListener("click",()=>{location.hash=""});
 $("catSearch").addEventListener("input",renderCats);
-function ask(msg,withInput){return new Promise(res=>{$("aMsg").textContent=msg;const i=$("aIn");i.hidden=!withInput;i.value="";const d=$("askDlg");const done=v=>{d.close();res(v)};$("aOk").onclick=()=>done(withInput?i.value:true);$("aNo").onclick=()=>done(withInput?null:false);d.oncancel=()=>res(withInput?null:false);d.showModal()})}
+function ask(msg,withInput){
+  return new Promise(res=>{
+    $("aMsg").textContent=msg;
+    const i=$("aIn");i.hidden=!withInput;i.value="";
+    const d=$("askDlg");
+    const done=v=>{d.close();res(v)};
+    $("aOk").onclick=()=>done(withInput?i.value:true);
+    $("aNo").onclick=()=>done(withInput?null:false);
+    i.onkeydown=e=>{if(e.key==="Enter")done(i.value)};
+    d.oncancel=()=>res(withInput?null:false);
+    d.showModal();
+  });
+}
 const enc=new TextEncoder();
 const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
 const newSalt=()=>b64(crypto.getRandomValues(new Uint8Array(16)));
 async function hashPw(pw,salt){const k=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);return b64(await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(atob(salt),c=>c.charCodeAt(0)),iterations:100000,hash:"SHA-256"},k,256))}
 const uid=u=>u.trim().toLowerCase().replace(/[^a-z0-9._-]/g,"");
+async function canWrite(){try{if(userCap&&userCap.canEdit)return !!(await userCap.canEdit())}catch(e){}return !!assets}
 
-function authInit(){
-  S={...DEF,...LS.get("fama_settings",{})};
-  cats=LS.get("fama_categories",[]);
-  items=LS.get("fama_tutorials",[]);
-  users=LS.get("fama_users",[]);
-  applySettings();
-  const sess=LS.get("fama_session",null);
-  if(sess){
-    const u=users.find(x=>x.id===sess.u);
-    if(u&&u.hash===sess.h){enter(u.id,u,u.hash);return}
-  }
-  showGate();
+function startData(){
+  $("msg").textContent="Carregando tutoriais…";
+  db.collection("categories").orderBy("order","asc").onSnapshot(s=>{
+    cats=s.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  },()=>{render()});
+  db.collection("tutorials").orderBy("createdAt","desc").onSnapshot(s=>{
+    items=s.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  },()=>{render()});
 }
-function showGate(){
+
+async function authInit(){
+  try{const s=await db.doc("settings/site").get();if(s.exists){S={...DEF,...s.data()};applySettings()}}catch(e){}
+  try{const r=JSON.parse(sessionStorage.getItem("fama_s")||"null");if(r){const d=await db.collection("users").doc(r.u).get();if(d.exists&&d.data().hash===r.h){enter(r.u,d.data(),r.h);return}}}catch(e){}
+  await showGate();
+}
+async function showGate(){
   $("gate").hidden=false;$("gForm").hidden=false;$("gErr").textContent="";$("gPass").value="";$("gLogo").textContent=S.logo;
-  setupMode=!users.length;
+  let any=false;try{any=(await db.collection("users").limit(1).get()).size>0}catch(e){}
+  setupMode=!any;const w=await canWrite();
   $("gNameW").hidden=$("gPass2W").hidden=!setupMode;
   $("gTitle").textContent=setupMode?"Criar usuário master":S.name;
   $("gGo").textContent=setupMode?"Criar e entrar":"Entrar";
-  $("gInfo").textContent=setupMode
-    ?"Primeiro acesso: crie o usuário master, que gerencia tudo e cria os demais usuários."
-    :"Digite o usuário e a senha fornecidos pelo administrador.";
+  $("gInfo").textContent=setupMode?(w?"Primeiro acesso: crie o usuário master, que gerencia tudo e cria os demais usuários.":"O site ainda não foi configurado. Peça ao administrador para fazer o primeiro acesso."):"Digite o usuário e a senha fornecidos pelo administrador.";
+  if(setupMode&&!w)$("gForm").hidden=true;
 }
 function applyRole(){["cfgBtn","addBtn","newCatBtn"].forEach(k=>$(k).hidden=!isMaster)}
 function enter(id,d,h){
-  me={id,name:d.name||id};isMaster=d.role==="master";ready=true;
-  LS.set("fama_session",{u:id,h});
+  me={id,name:d.name||id};isMaster=d.role==="master";
+  try{sessionStorage.setItem("fama_s",JSON.stringify({u:id,h}))}catch(e){}
   $("gate").hidden=true;$("gPass").value="";
   $("who").textContent="👤 "+me.name+(isMaster?" (master)":"");$("outBtn").hidden=false;
-  applyRole();render();if(isMaster)drawUsers();
+  applyRole();startData();if(isMaster)startUsers();
 }
-$("outBtn").addEventListener("click",()=>{localStorage.removeItem("fama_session");location.reload()});
+$("outBtn").addEventListener("click",()=>{try{sessionStorage.removeItem("fama_s")}catch(e){}location.reload()});
 $("gPass").addEventListener("keydown",e=>{if(e.key==="Enter")$("gGo").click()});
+$("gPass2").addEventListener("keydown",e=>{if(e.key==="Enter")$("gGo").click()});
 $("gGo").addEventListener("click",async()=>{
-  const u=uid($("gUser").value),p=$("gPass").value,err=$("gErr");err.textContent="";
-  if(!u||!p){err.textContent="Informe usuário e senha.";return}
+  const u=uid($("gUser").value),p=$("gPass").value,e=$("gErr");e.textContent="";
+  if(!u||!p){e.textContent="Informe usuário e senha.";return}
   $("gGo").disabled=true;
   try{
     if(setupMode){
-      if(p.length<6){err.textContent="Use pelo menos 6 caracteres.";return}
-      if(p!==$("gPass2").value){err.textContent="As senhas não conferem.";return}
-      const salt=newSalt(),hash=await hashPw(p,salt),data={id:u,name:$("gName").value.trim()||u,role:"master",salt,hash,createdAt:Date.now()};
-      users=[data];LS.set("fama_users",users);enter(u,data,hash);return;
+      if(p.length<6){e.textContent="Use pelo menos 6 caracteres.";return}
+      if(p!==$("gPass2").value){e.textContent="As senhas não conferem.";return}
+      if((await db.collection("users").limit(1).get()).size>0){e.textContent="Já existe um usuário master. Recarregue a página.";return}
+      const salt=newSalt(),hash=await hashPw(p,salt),data={name:$("gName").value.trim()||u,role:"master",salt,hash,createdAt:Date.now()};
+      await db.collection("users").doc(u).set(data);enter(u,data,hash);return;
     }
-    const x=users.find(item=>item.id===u);
-    if(!x||(await hashPw(p,x.salt))!==x.hash){err.textContent="Usuário ou senha incorretos.";return}
+    const d=await db.collection("users").doc(u).get(),x=d.exists?d.data():null;
+    if(!x||(await hashPw(p,x.salt))!==x.hash){e.textContent="Usuário ou senha incorretos.";return}
     enter(u,x,x.hash);
-  }catch(e){err.textContent="Erro: "+((e&&e.message)||"tente novamente.")}
+  }catch(err){e.textContent="Erro: "+((err&&err.message)||"tente novamente.")}
   finally{$("gGo").disabled=false}
 });
-
 $("newCatBtn").addEventListener("click",()=>{$("ncName").value="";$("ncDesc").value="";$("ncIcon").value="📁";$("ncSt").textContent="";$("ncDlg").showModal()});
 $("ncCancel").addEventListener("click",()=>$("ncDlg").close());
-$("ncSave").addEventListener("click",()=>{
+$("ncSave").addEventListener("click",async()=>{
   const name=$("ncName").value.trim(),st=$("ncSt");st.className="status err";
   if(!name){st.textContent="Informe o nome.";return}
   if(catList().some(c=>c.name.toLowerCase()===name.toLowerCase())){st.textContent="Já existe uma categoria com esse nome.";return}
-  if(!cats.length)cats=DEFCATS.map(c=>({...c}));
-  cats.push({id:"c"+Date.now(),name,desc:$("ncDesc").value.trim(),icon:$("ncIcon").value.trim()||"📁",order:cats.length});
-  LS.set("fama_categories",cats);render();$("ncDlg").close();
+  $("ncSave").disabled=true;st.className="status";st.textContent="Salvando…";
+  try{
+    const n=catList().length;
+    if(!cats.length){for(const c of DEFCATS)await db.collection("categories").doc("c"+c.order+Date.now()).set({name:c.name,desc:c.desc,icon:c.icon,order:c.order})}
+    await db.collection("categories").add({name,desc:$("ncDesc").value.trim(),icon:$("ncIcon").value.trim()||"📁",order:n});
+    $("ncDlg").close();
+  }catch(e){st.className="status err";st.textContent="Não foi possível salvar"+((e&&e.message)?": "+e.message:".")}
+  $("ncSave").disabled=false;
 });
-
+function startUsers(){db.collection("users").orderBy("createdAt","asc").onSnapshot(s=>{users=s.docs.map(d=>({id:d.id,...d.data()}));drawUsers()},()=>{})}
 function drawUsers(){
   const b=$("userList");b.textContent="";
   users.forEach(u=>{
@@ -397,18 +512,9 @@ function drawUsers(){
     if(u.role!=="master"){
       const w=document.createElement("span");w.className="rowr";
       const a=document.createElement("button");a.type="button";a.className="btn ghost small";a.textContent="Nova senha";
-      a.addEventListener("click",async()=>{
-        const p=await ask("Nova senha para "+u.id+" (mínimo 6 caracteres):",true);
-        if(!p)return;
-        if(p.length<6){$("usSt").textContent="A senha precisa ter 6 ou mais caracteres.";return}
-        const salt=newSalt();u.salt=salt;u.hash=await hashPw(p,salt);
-        LS.set("fama_users",users);$("usSt").textContent="Senha de "+u.id+" alterada.";
-      });
+      a.addEventListener("click",async()=>{const p=await ask("Nova senha para "+u.id+" (mínimo 6 caracteres):",true);if(!p)return;if(p.length<6){$("usSt").textContent="A senha precisa ter 6 ou mais caracteres.";return}try{const salt=newSalt();await db.collection("users").doc(u.id).update({salt,hash:await hashPw(p,salt)});$("usSt").textContent="Senha de "+u.id+" alterada."}catch(e){$("usSt").textContent="Não foi possível alterar a senha."}});
       const d=document.createElement("button");d.type="button";d.className="btn danger small";d.textContent="Excluir";
-      d.addEventListener("click",async()=>{
-        if(!(await ask("Excluir o usuário "+u.id+"?")))return;
-        users=users.filter(x=>x.id!==u.id);LS.set("fama_users",users);drawUsers();
-      });
+      d.addEventListener("click",async()=>{if(!(await ask("Excluir o usuário "+u.id+"?")))return;try{await db.collection("users").doc(u.id).delete()}catch(e){$("usSt").textContent="Não foi possível excluir."}});
       w.append(a,d);r.appendChild(w);
     }
     b.appendChild(r);
@@ -420,15 +526,12 @@ $("usAdd").addEventListener("click",async()=>{
   if(p.length<6){st.textContent="A senha precisa ter 6 ou mais caracteres.";return}
   if(users.some(x=>x.id===id)){st.textContent="Esse usuário já existe.";return}
   $("usAdd").disabled=true;
-  try{
-    const salt=newSalt();
-    users.push({id,name:$("usN").value.trim()||id,role:"user",salt,hash:await hashPw(p,salt),createdAt:Date.now()});
-    LS.set("fama_users",users);drawUsers();
-    st.textContent="Usuário "+id+" criado. Passe a senha para a pessoa.";$("usU").value="";$("usN").value="";$("usP").value="";
-  }catch(e){st.textContent="Não foi possível criar."}
+  try{const salt=newSalt();await db.collection("users").doc(id).set({name:$("usN").value.trim()||id,role:"user",salt,hash:await hashPw(p,salt),createdAt:Date.now()});st.textContent="Usuário "+id+" criado. Passe a senha para a pessoa.";$("usU").value="";$("usN").value="";$("usP").value=""}
+  catch(e){st.textContent="Não foi possível criar"+((e&&e.message)?": "+e.message:".")}
   $("usAdd").disabled=false;
 });
 
+/* Configurações */
 function tab(n){["A","B","C","D"].forEach(k=>{$("pane"+k).hidden=k!==n;$("tab"+k).classList.toggle("on",k===n)})}
 $("tabA").onclick=()=>tab("A");$("tabB").onclick=()=>tab("B");$("tabC").onclick=()=>tab("C");$("tabD").onclick=()=>tab("D");
 function fillForm(s){
@@ -440,43 +543,117 @@ function readForm(){return{navy:$("sNavy").value,accent:$("sAccent").value,font:
 ["sNavy","sAccent","sFont","sTheme","sSize","sRadius","sLogo","sName","sSub","sH1","sP","sFoot"].forEach(id=>$(id).addEventListener("input",()=>{
   $("sSizeV").textContent=$("sSize").value;$("sRadiusV").textContent=$("sRadius").value;S={...S,...readForm()};applySettings();
 }));
+
 function drawCats(){
   const box=$("catEdit");box.textContent="";
   draft.forEach((c,i)=>{
     const r=document.createElement("div");r.className="catrow";
-    const mk=(v,ph,k,cls)=>{const x=document.createElement("input");x.type="text";x.value=v||"";x.placeholder=ph;if(cls)x.className=cls;x.addEventListener("input",()=>{c[k]=x.value});return x};
-    const del=document.createElement("button");del.type="button";del.className="btn danger small";del.textContent="Excluir";
-    del.addEventListener("click",()=>{if(c.id&&!c.isNew)removed.push(c);draft.splice(i,1);drawCats()});
-    r.append(mk(c.icon,"😀","icon"),mk(c.name,"Nome","name"),mk(c.desc,"Descrição","desc","cd"),del);box.appendChild(r);
+    const mk=(v,ph,k,cls)=>{
+      const x=document.createElement("input");x.type="text";x.value=v||"";x.placeholder=ph;
+      if(cls)x.className=cls;
+      x.addEventListener("input",()=>{draft[i][k]=x.value});
+      return x;
+    };
+    const ico=mk(c.icon,"📁","icon");ico.maxLength=4;
+    const nm=mk(c.name,"Nome","name");nm.maxLength=60;
+    const ds=mk(c.desc,"Descrição","desc","cd");ds.maxLength=100;
+    const del=document.createElement("button");del.type="button";del.className="btn danger small";del.textContent="✕";
+    del.addEventListener("click",()=>{
+      const item=draft[i];
+      if(item&&item.id&&!item.isDefault)removed.push(item.id);
+      draft.splice(i,1);
+      drawCats();
+    });
+    r.append(ico,nm,ds,del);
+    box.appendChild(r);
   });
 }
-let saved=null;
-$("cfgBtn").addEventListener("click",()=>{
-  saved={...S};fillForm(S);draft=catList().map(c=>({...c,orig:c.name}));removed=[];drawCats();tab("A");$("cStatus").textContent="";$("cfgDlg").showModal();
-});
-$("catAdd").addEventListener("click",()=>{draft.push({id:"c"+Date.now()+Math.random().toString(36).slice(2,5),icon:"📁",name:"",desc:"",isNew:true});drawCats()});
-$("cCancel").addEventListener("click",()=>{S=saved;applySettings();$("cfgDlg").close()});
-$("cfgDlg").addEventListener("cancel",()=>{S=saved;applySettings()});
-$("cReset").addEventListener("click",async()=>{if(!(await ask("Restaurar cores, fonte e textos padrão? As categorias não mudam.")))return;S={...DEF};fillForm(S);applySettings()});
-$("cSave").addEventListener("click",()=>{
-  const st=$("cStatus");st.className="status";
-  if(draft.some(c=>!c.name.trim())){st.textContent="Toda categoria precisa de um nome.";st.className="status err";tab("C");return}
-  const names=draft.map(c=>c.name.trim().toLowerCase());
-  if(new Set(names).size!==names.length){st.textContent="Há categorias com nomes repetidos.";st.className="status err";tab("C");return}
-  S={...S,...readForm()};
-  LS.set("fama_settings",S);
-  cats=draft.map((c,i)=>{
-    const name=c.name.trim();
-    if(c.orig&&c.orig!==name){
-      items.forEach(t=>{if(t.category===c.orig)t.category=name});
-      LS.set("fama_tutorials",items);
-    }
-    return{id:c.id,name,desc:(c.desc||"").trim(),icon:(c.icon||"").trim()||"📁",order:i};
-  });
-  LS.set("fama_categories",cats);
-  applySettings();render();$("cfgDlg").close();
+
+$("catAdd").addEventListener("click",()=>{
+  draft.push({icon:"📁",name:"",desc:"",order:draft.length});
+  drawCats();
 });
 
+$("cfgBtn").addEventListener("click",()=>{
+  $("cStatus").textContent="";$("cStatus").className="status";
+  draft=catList().map((c,idx)=>({...c,order:idx}));
+  removed=[];
+  fillForm(S);
+  drawCats();
+  tab("A");
+  $("cfgDlg").showModal();
+});
+
+$("cReset").addEventListener("click",async()=>{
+  if(!(await ask("Restaurar aparência e textos padrão?")))return;
+  S={...DEF};
+  fillForm(S);
+  applySettings();
+});
+
+$("cCancel").addEventListener("click",()=>{
+  try{
+    db.doc("settings/site").get().then(s=>{
+      if(s.exists){S={...DEF,...s.data()};applySettings();}
+    });
+  }catch(e){}
+  $("cfgDlg").close();
+});
+
+$("cSave").addEventListener("click",async()=>{
+  const st=$("cStatus");st.className="status";
+  const nextS={...S,...readForm()};
+  const validDraft=draft.map((c,idx)=>({
+    id:c.id,
+    icon:(c.icon||"").trim()||"📁",
+    name:(c.name||"").trim(),
+    desc:(c.desc||"").trim(),
+    order:idx,
+    origName:c.origName!==undefined?c.origName:(c.id?((cats.find(x=>x.id===c.id)||{}).name||c.name):c.name)
+  })).filter(c=>c.name);
+
+  $("cSave").disabled=true;st.textContent="Salvando configurações…";
+  try{
+    await db.doc("settings/site").set(nextS);
+    S={...nextS};applySettings();
+
+    const hadDefaultOnly=!cats.length;
+    if(hadDefaultOnly){
+      for(const dc of DEFCATS){
+        await db.collection("categories").doc("c"+dc.order+Date.now()).set({name:dc.name,desc:dc.desc,icon:dc.icon,order:dc.order});
+      }
+    }
+    for(const rid of removed){
+      await db.collection("categories").doc(rid).delete();
+    }
+    for(const c of validDraft){
+      if(c.origName&&c.origName!==c.name){
+        const affected=items.filter(t=>t.category===c.origName);
+        for(const t of affected){
+          await db.collection("tutorials").doc(t.id).update({category:c.name});
+        }
+      }
+      if(c.id&&!c.isDefault){
+        await db.collection("categories").doc(c.id).update({icon:c.icon,name:c.name,desc:c.desc,order:c.order});
+      }else{
+        await db.collection("categories").add({icon:c.icon,name:c.name,desc:c.desc,order:c.order});
+      }
+    }
+    st.textContent="Configurações salvas.";
+    setTimeout(()=>$("cfgDlg").close(),250);
+  }catch(e){
+    st.className="status err";
+    st.textContent="Erro ao salvar"+((e&&e.message)?": "+e.message:".");
+  }
+  $("cSave").disabled=false;
+});
+
+applySettings();
+route();
+renderCats();
+const fallback=createLocalFallback();
+if(!db)db=fallback.db;
+if(!assets)assets=fallback.assets;
 authInit();
 </script>
 </body>
