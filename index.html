@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fama Informática | Central de Tutoriais</title>
+<style>
+:root{--navy:#15385f;--blue:#1685ed;--bg:#080808;--wrapbg:#050505;--panel:#101010;--hover:#171717;--line:#292929;--muted:#c7c7c7;--text:#f4f4f4;--input:#fff;--inputtext:#222;--danger:#e5484d;--fs:14px;--r:8px;--font:Arial,Helvetica,sans-serif;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#eef1f5;--wrapbg:#fff;--panel:#f6f8fb;--hover:#eaf0f7;--line:#d9e0ea;--muted:#4a5565;--text:#111827;color-scheme:light}
+@media(prefers-color-scheme:light){:root:not([data-theme]){--bg:#eef1f5;--wrapbg:#fff;--panel:#f6f8fb;--hover:#eaf0f7;--line:#d9e0ea;--muted:#4a5565;--text:#111827;color-scheme:light}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:var(--fs)}
+.wrap{width:min(100%,920px);margin:22px auto;border:1px solid var(--line);border-radius:calc(var(--r)*2);overflow:hidden;background:var(--wrapbg)}
+header{background:var(--navy);padding:16px 18px 13px;color:#f4f4f4}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.logo{min-width:37px;height:37px;padding:0 6px;border-radius:var(--r);background:#fff;color:var(--navy);display:grid;place-items:center;font-size:20px;font-weight:bold}
+#brandName{font-size:1.2em;font-weight:700}#brandSub{font-size:.72em;margin-top:2px;letter-spacing:.2px}
+h1{font-size:1.5em;margin:0 0 8px}header p{margin:0 0 9px;font-size:.93em;color:#e4edf7}
+.search{height:39px;background:var(--input);border-radius:var(--r);display:flex;align-items:center;padding:0 11px;gap:9px;color:#6b7280}
+.search input{border:0;outline:0;width:100%;font:inherit;color:var(--inputtext);background:transparent}
+main{padding:15px 12px 20px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 14px}
+.section-title,.tutorials h2{font-size:1em;font-weight:700;margin:0}
+.categories{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;row-gap:12px}
+.category{display:flex;align-items:flex-start;gap:11px;padding:8px 10px;border-radius:var(--r);cursor:pointer;min-height:70px;transition:background .15s}
+.category:hover,.category.active{background:var(--hover)}
+.ico{font-size:20px;line-height:1;flex:none}
+.category h3{font-size:1em;margin:0 0 6px}.category p{font-size:.86em;color:var(--muted);margin:0;line-height:1.4}
+.tutorials{border-top:1px solid var(--line);margin-top:14px;padding-top:15px}
+.tutorial-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tutorial{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:11px;display:flex;gap:10px;align-items:center;cursor:pointer;color:inherit;text-align:left;font:inherit;width:100%}
+.tutorial:hover{border-color:var(--blue)}
+.play{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;flex:none}
+.tutorial .info{min-width:0;flex:1}
+.tutorial strong{font-size:.93em;display:block;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}
+.tutorial small{color:var(--muted);font-size:.8em}
+.msg{color:var(--muted);padding:8px 10px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:var(--r);padding:9px 14px;font:inherit;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.btn.small{padding:5px 9px;font-size:.85em}
+.btn.danger{background:var(--danger)}
+.btn:disabled{opacity:.6;cursor:wait}
+header .btn.ghost{color:#fff;border-color:#ffffff66}
+footer{border-top:1px solid var(--line);padding:12px 16px;color:var(--muted);font-size:.8em;text-align:center}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--wrapbg);color:var(--text);padding:0;width:min(94vw,680px);max-height:92vh;font-family:var(--font)}
+dialog::backdrop{background:#000a}
+.dlg{padding:16px}.dlg h3{margin:0 0 12px;font-size:1.15em}
+.dlg label{display:block;font-size:.86em;color:var(--muted);margin:10px 0 4px}
+.dlg input[type=text],.dlg select,.dlg textarea{width:100%;padding:9px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
+.dlg input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:2px}
+.dlg textarea{min-height:70px;resize:vertical}
+.dlg video{width:100%;max-height:60vh;background:#000;border-radius:var(--r)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.tabs{display:flex;gap:6px;margin-bottom:6px}
+.tabs .btn{flex:1}.tabs .on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.catrow{display:grid;grid-template-columns:54px 1fr 1.4fr auto;gap:6px;margin-top:8px;align-items:center}
+.catrow input{width:100%;padding:8px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.status{font-size:.86em;margin-top:10px;color:var(--muted)}.status.err{color:var(--danger)}
+[hidden]{display:none!important}
+.gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}
+.gbox{width:min(100%,380px);background:var(--wrapbg);border:1px solid var(--line);border-radius:calc(var(--r)*2);padding:22px;text-align:center}
+.gbox label{display:block;text-align:left;font-size:.86em;color:var(--muted);margin:10px 0 4px}
+.gbox input{width:100%;padding:10px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
+.gbox .logo{margin:0 auto 10px;background:var(--navy);color:#fff;width:46px}
+.hbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;font-size:.86em}
+.rowr{display:flex;gap:6px;flex-wrap:wrap}
+.mini{padding:7px 9px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--text);font:inherit;width:180px}
+.chead{display:flex;gap:12px;align-items:center;margin:14px 0 4px}
+.urow{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px;flex-wrap:wrap}
+@media(max-width:560px){.wrap{margin:0;border-radius:0;min-height:100vh;border:0}.categories{column-gap:3px}.category{padding:8px 5px;gap:8px}.tutorial-list,.grid2{grid-template-columns:1fr}header{padding:15px 13px}main{padding:14px 9px}.catrow{grid-template-columns:50px 1fr auto}.catrow .cd{grid-column:1/-1;order:5}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="top">
+    <div class="brand"><div class="logo" id="logo">▣</div><div><div id="brandName"></div><div id="brandSub"></div></div></div>
+    <div class="hbar"><span id="who"></span><button class="btn ghost small" id="cfgBtn" hidden>⚙ Configurações</button><button class="btn ghost small" id="outBtn" hidden>Sair</button></div>
+  </div>
+  <h1 id="h1"></h1><p id="hp"></p>
+  <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Pesquisar tutorial..." aria-label="Pesquisar tutorial"></label>
+</header>
+<main>
+  <div id="catSection">
+    <div class="row"><h2 class="section-title">Categorias de tutoriais</h2><div class="rowr"><input type="search" id="catSearch" class="mini" placeholder="Pesquisar categoria..." aria-label="Pesquisar categoria"><button class="btn small" id="newCatBtn" hidden>+ Nova categoria</button></div></div>
+    <div class="categories" id="categories"></div>
+  </div>
+  <div id="catHead" hidden>
+    <button class="btn ghost small" id="backBtn" type="button">← Voltar às categorias</button>
+    <div class="chead"><span class="ico" id="chIcon" style="font-size:30px"></span><div><h2 id="chName" style="margin:0"></h2><p id="chDesc" class="status" style="margin:4px 0 0"></p></div></div>
+  </div>
+  <div class="tutorials">
+    <div class="row"><h2 id="tutTitle">Últimos tutoriais</h2><button class="btn" id="addBtn" hidden>+ Enviar vídeo</button></div>
+    <div class="tutorial-list" id="list"></div>
+    <div class="msg" id="msg">Carregando tutoriais…</div>
+  </div>
+</main>
+<footer id="footer"></footer>
+</div>
+
+<div class="gate" id="gate"><div class="gbox">
+  <div class="logo" id="gLogo">▣</div><h3 id="gTitle" style="margin:0 0 6px">Central de Tutoriais</h3>
+  <p class="status" id="gInfo">Carregando…</p>
+  <div id="gForm" hidden>
+    <label for="gUser">Usuário</label><input type="text" id="gUser" autocomplete="username" autocapitalize="none">
+    <div id="gNameW" hidden><label for="gName">Seu nome</label><input type="text" id="gName" maxlength="60"></div>
+    <label for="gPass">Senha</label><input type="password" id="gPass" autocomplete="current-password">
+    <div id="gPass2W" hidden><label for="gPass2">Repita a senha</label><input type="password" id="gPass2" autocomplete="new-password"></div>
+    <div class="status err" id="gErr"></div>
+    <button class="btn" id="gGo" type="button" style="width:100%;margin-top:12px">Entrar</button>
+  </div>
+</div></div>
+
+<dialog id="askDlg"><div class="dlg"><p id="aMsg" style="margin:0 0 8px"></p><input type="text" id="aIn" hidden><div class="actions"><button class="btn ghost" id="aNo" type="button">Cancelar</button><button class="btn" id="aOk" type="button">OK</button></div></div></dialog>
+
+<dialog id="ncDlg"><div class="dlg">
+  <h3>Nova categoria</h3>
+  <label for="ncIcon">Ícone (emoji)</label><input type="text" id="ncIcon" maxlength="4">
+  <label for="ncName">Nome</label><input type="text" id="ncName" maxlength="60">
+  <label for="ncDesc">Descrição</label><input type="text" id="ncDesc" maxlength="100">
+  <div class="status" id="ncSt"></div>
+  <div class="actions"><button class="btn ghost" id="ncCancel" type="button">Cancelar</button><button class="btn" id="ncSave" type="button">Criar</button></div>
+</div></dialog>
+
+<dialog id="uploadDlg"><div class="dlg">
+  <h3>Enviar novo vídeo tutorial</h3>
+  <label for="uTitle">Título</label><input type="text" id="uTitle" maxlength="120" placeholder="Ex.: Como emitir uma NF-e">
+  <label for="uCat">Categoria</label><select id="uCat"></select>
+  <label for="uDesc">Descrição (opcional)</label><textarea id="uDesc" maxlength="500"></textarea>
+  <label for="uFile">Vídeo (até 20 MB)</label><input type="file" id="uFile" accept="video/*">
+  <div class="status" id="uStatus"></div>
+  <div class="actions"><button class="btn ghost" id="uCancel" type="button">Cancelar</button><button class="btn" id="uSend" type="button">Enviar</button></div>
+</div></dialog>
+
+<dialog id="viewDlg"><div class="dlg">
+  <h3 id="vTitle"></h3><video id="vVideo" controls playsinline></video><p id="vDesc" class="status"></p>
+  <div class="actions"><button class="btn danger" id="vDel" type="button" hidden>Excluir</button><button class="btn ghost" id="vClose" type="button">Fechar</button></div>
+</div></dialog>
+
+<dialog id="cfgDlg"><div class="dlg">
+  <h3>Configurações do site</h3>
+  <div class="tabs"><button class="btn ghost on" id="tabA" type="button">Aparência</button><button class="btn ghost" id="tabB" type="button">Textos</button><button class="btn ghost" id="tabC" type="button">Categorias</button><button class="btn ghost" id="tabD" type="button">Usuários</button></div>
+  <div id="paneA">
+    <div class="grid2">
+      <div><label for="sNavy">Cor do cabeçalho</label><input type="color" id="sNavy"></div>
+      <div><label for="sAccent">Cor de destaque</label><input type="color" id="sAccent"></div>
+      <div><label for="sFont">Fonte</label><select id="sFont">
+        <option value="Arial,Helvetica,sans-serif">Arial</option><option value="Verdana,Geneva,sans-serif">Verdana</option><option value="'Trebuchet MS',sans-serif">Trebuchet</option><option value="Georgia,serif">Georgia</option><option value="'Times New Roman',serif">Times New Roman</option><option value="'Courier New',monospace">Courier New</option><option value="system-ui,sans-serif">Padrão do sistema</option></select></div>
+      <div><label for="sTheme">Tema</label><select id="sTheme"><option value="dark">Escuro</option><option value="light">Claro</option><option value="auto">Automático</option></select></div>
+      <div><label for="sSize">Tamanho da letra: <span id="sSizeV"></span>px</label><input type="range" id="sSize" min="12" max="18" step="1" style="width:100%"></div>
+      <div><label for="sRadius">Arredondamento: <span id="sRadiusV"></span>px</label><input type="range" id="sRadius" min="0" max="20" step="1" style="width:100%"></div>
+    </div>
+  </div>
+  <div id="paneB" hidden>
+    <label for="sLogo">Símbolo do logo (letra ou emoji)</label><input type="text" id="sLogo" maxlength="4">
+    <label for="sName">Nome da empresa</label><input type="text" id="sName" maxlength="60">
+    <label for="sSub">Subtítulo</label><input type="text" id="sSub" maxlength="60">
+    <label for="sH1">Título principal</label><input type="text" id="sH1" maxlength="100">
+    <label for="sP">Texto de apoio</label><input type="text" id="sP" maxlength="160">
+    <label for="sFoot">Rodapé</label><input type="text" id="sFoot" maxlength="160">
+  </div>
+  <div id="paneC" hidden>
+    <div id="catEdit"></div>
+    <div class="actions" style="justify-content:flex-start"><button class="btn ghost small" id="catAdd" type="button">+ Nova categoria</button></div>
+    <div class="status">Ao renomear uma categoria, os vídeos dela são atualizados junto.</div>
+  </div>
+  <div id="paneD" hidden>
+    <div id="userList"></div>
+    <h3 style="margin:16px 0 0;font-size:1em">Novo usuário</h3>
+    <div class="grid2">
+      <div><label for="usU">Usuário (sem espaços)</label><input type="text" id="usU" maxlength="30" autocomplete="off"></div>
+      <div><label for="usN">Nome</label><input type="text" id="usN" maxlength="60"></div>
+      <div><label for="usP">Senha (mínimo 6)</label><input type="text" id="usP" maxlength="60" autocomplete="off"></div>
+    </div>
+    <div class="actions" style="justify-content:flex-start"><button class="btn small" id="usAdd" type="button">Criar usuário</button></div>
+    <div class="status" id="usSt"></div>
+  </div>
+  <div class="status" id="cStatus"></div>
+  <div class="actions"><button class="btn ghost" id="cReset" type="button">Restaurar padrão</button><button class="btn ghost" id="cCancel" type="button">Cancelar</button><button class="btn" id="cSave" type="button">Salvar</button></div>
+</div></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const DEF={name:"FAMA INFORMÁTICA",sub:"CENTRAL DE TUTORIAIS",h1:"Aprenda a utilizar seu sistema",p:"Encontre tutoriais e soluções para suas dúvidas.",footer:"Fama Informática • Suporte e treinamento para nossos clientes",logo:"▣",navy:"#15385f",accent:"#1685ed",font:"Arial,Helvetica,sans-serif",size:14,radius:8,theme:"dark"};
+const DEFCATS=[["🖥️","Sistema SCE","Instalação e utilização"],["📄","Notas fiscais","NF-e e NFC-e"],["💾","Backup","Cópias e restauração"],["📦","Cadastros","Produtos e clientes"],["💰","Financeiro","Contas e pagamentos"],["❓","Dúvidas frequentes","Problemas e soluções"]].map((c,i)=>({id:"d"+i,icon:c[0],name:c[1],desc:c[2],order:i,isDefault:true}));
+
+let items=[],cats=[],S={...DEF},selected="",current=null,draft=[],removed=[];
+let me=null,users=[],isMaster=false,setupMode=false,ready=false;
+
+/* Armazenamento local: localStorage para dados/configurações e IndexedDB para vídeos */
+const LS={
+  get(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb}catch(e){return fb}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+function openVideoDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open("fama_videos_db",1);
+    req.onupgradeneeded=()=>req.result.createObjectStore("videos",{keyPath:"id"});
+    req.onsuccess=()=>res(req.result);
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function saveVideoBlob(id,file){
+  const idb=await openVideoDB();
+  return new Promise((res,rej)=>{
+    const tx=idb.transaction("videos","readwrite");
+    tx.objectStore("videos").put({id,blob:file,type:file.type});
+    tx.oncomplete=()=>res(id);
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+async function getVideoUrl(id){
+  const idb=await openVideoDB();
+  return new Promise((res,rej)=>{
+    const tx=idb.transaction("videos","readonly");
+    const req=tx.objectStore("videos").get(id);
+    req.onsuccess=()=>res(req.result&&req.result.blob?URL.createObjectURL(req.result.blob):"");
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function deleteVideoBlob(id){
+  try{
+    const idb=await openVideoDB();
+    const tx=idb.transaction("videos","readwrite");
+    tx.objectStore("videos").delete(id);
+  }catch(e){}
+}
+
+function applySettings(){
+  const r=document.documentElement.style;
+  r.setProperty("--navy",S.navy);r.setProperty("--blue",S.accent);r.setProperty("--font",S.font);r.setProperty("--fs",S.size+"px");r.setProperty("--r",S.radius+"px");
+  if(S.theme==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",S.theme);
+  $("logo").textContent=S.logo;$("brandName").textContent=S.name;$("brandSub").textContent=S.sub;$("h1").textContent=S.h1;$("hp").textContent=S.p;$("footer").textContent=S.footer;
+}
+function catList(){return cats.length?cats:DEFCATS}
+function renderCats(){
+  const box=$("categories");box.textContent="";
+  const cq=$("catSearch").value.toLocaleLowerCase("pt-BR");
+  catList().filter(c=>(c.name+" "+(c.desc||"")).toLocaleLowerCase("pt-BR").includes(cq)).forEach(c=>{
+    const d=document.createElement("div");d.className="category";
+    const i=document.createElement("span");i.className="ico";i.textContent=c.icon||"📁";
+    const w=document.createElement("div");const h=document.createElement("h3");h.textContent=c.name;const p=document.createElement("p");p.textContent=c.desc||"";
+    w.append(h,p);d.append(i,w);d.addEventListener("click",()=>{location.hash=slug(c)});box.appendChild(d);
+  });
+  const sel=$("uCat");sel.textContent="";catList().forEach(c=>{const o=document.createElement("option");o.value=c.name;o.textContent=c.name;sel.appendChild(o)});
+}
+function render(){
+  route();renderCats();
+  const q=$("search").value.toLocaleLowerCase("pt-BR"),list=$("list");list.textContent="";let shown=0;
+  items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).forEach(t=>{
+    if(!((!selected||t.category===selected)&&(t.title+" "+t.category).toLocaleLowerCase("pt-BR").includes(q)))return;
+    shown++;
+    const b=document.createElement("button");b.className="tutorial";b.type="button";
+    const p=document.createElement("div");p.className="play";p.textContent="▶";
+    const info=document.createElement("div");info.className="info";
+    const s=document.createElement("strong");s.textContent=t.title;const sm=document.createElement("small");sm.textContent=t.category+" • Vídeo tutorial";
+    info.append(s,sm);b.append(p,info);b.addEventListener("click",()=>openView(t));list.appendChild(b);
+  });
+  const m=$("msg");
+  if(!ready){m.textContent="Entre na sua conta para ver os tutoriais publicados.";m.style.display="block"}
+  else if(!shown){m.textContent=items.length?"Nenhum tutorial encontrado. Tente outra pesquisa.":"Ainda não há tutoriais publicados.";m.style.display="block"}
+  else m.style.display="none";
+}
+$("search").addEventListener("input",render);
+
+async function openView(t){
+  current=t;$("vTitle").textContent=t.title;$("vDesc").textContent=t.description||"";
+  const vid=$("vVideo");
+  if(vid.dataset.objUrl){URL.revokeObjectURL(vid.dataset.objUrl);delete vid.dataset.objUrl}
+  const url=t.assetId?await getVideoUrl(t.assetId):"";
+  if(url){vid.src=url;vid.dataset.objUrl=url;$("vDesc").textContent=t.description||""}
+  else{$("vDesc").textContent=(t.description?t.description+" • ":"")+"Vídeo indisponível neste navegador."}
+  $("vDel").hidden=!isMaster;$("viewDlg").showModal();
+}
+function closeView(){
+  const vid=$("vVideo");vid.pause();vid.removeAttribute("src");
+  if(vid.dataset.objUrl){URL.revokeObjectURL(vid.dataset.objUrl);delete vid.dataset.objUrl}
+  $("viewDlg").close();
+}
+$("vClose").addEventListener("click",closeView);
+$("vDel").addEventListener("click",async()=>{
+  if(!current||!(await ask("Excluir este tutorial?")))return;
+  items=items.filter(x=>x.id!==current.id);
+  LS.set("fama_tutorials",items);
+  if(current.assetId)await deleteVideoBlob(current.assetId);
+  render();closeView();
+});
+
+$("addBtn").addEventListener("click",()=>{$("uStatus").textContent="";$("uStatus").className="status";$("uTitle").value="";$("uDesc").value="";$("uFile").value="";if(selected)$("uCat").value=selected;$("uploadDlg").showModal()});
+$("uCancel").addEventListener("click",()=>$("uploadDlg").close());
+$("uSend").addEventListener("click",async()=>{
+  const st=$("uStatus");st.className="status";const title=$("uTitle").value.trim(),f=$("uFile").files[0];
+  const err=m=>{st.textContent=m;st.className="status err"};
+  if(!title)return err("Informe o título.");if(!f)return err("Escolha um vídeo.");
+  if(!f.type.startsWith("video/"))return err("O arquivo precisa ser um vídeo.");
+  if(f.size>20*1024*1024)return err("O vídeo passa de 20 MB. Comprima ou corte e tente de novo.");
+  $("uSend").disabled=true;st.textContent="Enviando vídeo… aguarde.";
+  try{
+    const assetId="vid_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+    await saveVideoBlob(assetId,f);
+    const id="tut_"+Date.now();
+    items.push({id,title,category:$("uCat").value,description:$("uDesc").value.trim(),assetId,createdAt:Date.now()});
+    LS.set("fama_tutorials",items);
+    render();$("uploadDlg").close();
+  }catch(e){err("Falha no envio"+(e&&e.message?": "+e.message:"."))}
+  $("uSend").disabled=false;
+});
+
+const slug=c=>"c-"+String(c.id).replace(/[^A-Za-z0-9]/g,"");
+function route(){
+  const h=location.hash.slice(1),c=catList().find(c=>slug(c)===h);
+  selected=c?c.name:"";
+  $("catSection").hidden=!!c;$("catHead").hidden=!c;
+  $("tutTitle").textContent=c?"Vídeos desta categoria":"Últimos tutoriais";
+  if(c){$("chIcon").textContent=c.icon||"📁";$("chName").textContent=c.name;$("chDesc").textContent=c.desc||""}
+}
+window.addEventListener("hashchange",render);
+$("backBtn").addEventListener("click",()=>{location.hash=""});
+$("catSearch").addEventListener("input",renderCats);
+function ask(msg,withInput){return new Promise(res=>{$("aMsg").textContent=msg;const i=$("aIn");i.hidden=!withInput;i.value="";const d=$("askDlg");const done=v=>{d.close();res(v)};$("aOk").onclick=()=>done(withInput?i.value:true);$("aNo").onclick=()=>done(withInput?null:false);d.oncancel=()=>res(withInput?null:false);d.showModal()})}
+const enc=new TextEncoder();
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+const newSalt=()=>b64(crypto.getRandomValues(new Uint8Array(16)));
+async function hashPw(pw,salt){const k=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);return b64(await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(atob(salt),c=>c.charCodeAt(0)),iterations:100000,hash:"SHA-256"},k,256))}
+const uid=u=>u.trim().toLowerCase().replace(/[^a-z0-9._-]/g,"");
+
+function authInit(){
+  S={...DEF,...LS.get("fama_settings",{})};
+  cats=LS.get("fama_categories",[]);
+  items=LS.get("fama_tutorials",[]);
+  users=LS.get("fama_users",[]);
+  applySettings();
+  const sess=LS.get("fama_session",null);
+  if(sess){
+    const u=users.find(x=>x.id===sess.u);
+    if(u&&u.hash===sess.h){enter(u.id,u,u.hash);return}
+  }
+  showGate();
+}
+function showGate(){
+  $("gate").hidden=false;$("gForm").hidden=false;$("gErr").textContent="";$("gPass").value="";$("gLogo").textContent=S.logo;
+  setupMode=!users.length;
+  $("gNameW").hidden=$("gPass2W").hidden=!setupMode;
+  $("gTitle").textContent=setupMode?"Criar usuário master":S.name;
+  $("gGo").textContent=setupMode?"Criar e entrar":"Entrar";
+  $("gInfo").textContent=setupMode
+    ?"Primeiro acesso: crie o usuário master, que gerencia tudo e cria os demais usuários."
+    :"Digite o usuário e a senha fornecidos pelo administrador.";
+}
+function applyRole(){["cfgBtn","addBtn","newCatBtn"].forEach(k=>$(k).hidden=!isMaster)}
+function enter(id,d,h){
+  me={id,name:d.name||id};isMaster=d.role==="master";ready=true;
+  LS.set("fama_session",{u:id,h});
+  $("gate").hidden=true;$("gPass").value="";
+  $("who").textContent="👤 "+me.name+(isMaster?" (master)":"");$("outBtn").hidden=false;
+  applyRole();render();if(isMaster)drawUsers();
+}
+$("outBtn").addEventListener("click",()=>{localStorage.removeItem("fama_session");location.reload()});
+$("gPass").addEventListener("keydown",e=>{if(e.key==="Enter")$("gGo").click()});
+$("gGo").addEventListener("click",async()=>{
+  const u=uid($("gUser").value),p=$("gPass").value,err=$("gErr");err.textContent="";
+  if(!u||!p){err.textContent="Informe usuário e senha.";return}
+  $("gGo").disabled=true;
+  try{
+    if(setupMode){
+      if(p.length<6){err.textContent="Use pelo menos 6 caracteres.";return}
+      if(p!==$("gPass2").value){err.textContent="As senhas não conferem.";return}
+      const salt=newSalt(),hash=await hashPw(p,salt),data={id:u,name:$("gName").value.trim()||u,role:"master",salt,hash,createdAt:Date.now()};
+      users=[data];LS.set("fama_users",users);enter(u,data,hash);return;
+    }
+    const x=users.find(item=>item.id===u);
+    if(!x||(await hashPw(p,x.salt))!==x.hash){err.textContent="Usuário ou senha incorretos.";return}
+    enter(u,x,x.hash);
+  }catch(e){err.textContent="Erro: "+((e&&e.message)||"tente novamente.")}
+  finally{$("gGo").disabled=false}
+});
+
+$("newCatBtn").addEventListener("click",()=>{$("ncName").value="";$("ncDesc").value="";$("ncIcon").value="📁";$("ncSt").textContent="";$("ncDlg").showModal()});
+$("ncCancel").addEventListener("click",()=>$("ncDlg").close());
+$("ncSave").addEventListener("click",()=>{
+  const name=$("ncName").value.trim(),st=$("ncSt");st.className="status err";
+  if(!name){st.textContent="Informe o nome.";return}
+  if(catList().some(c=>c.name.toLowerCase()===name.toLowerCase())){st.textContent="Já existe uma categoria com esse nome.";return}
+  if(!cats.length)cats=DEFCATS.map(c=>({...c}));
+  cats.push({id:"c"+Date.now(),name,desc:$("ncDesc").value.trim(),icon:$("ncIcon").value.trim()||"📁",order:cats.length});
+  LS.set("fama_categories",cats);render();$("ncDlg").close();
+});
+
+function drawUsers(){
+  const b=$("userList");b.textContent="";
+  users.forEach(u=>{
+    const r=document.createElement("div");r.className="urow";
+    const t=document.createElement("span");t.textContent=(u.name||u.id)+" ("+u.id+") • "+(u.role==="master"?"Master":"Usuário");r.appendChild(t);
+    if(u.role!=="master"){
+      const w=document.createElement("span");w.className="rowr";
+      const a=document.createElement("button");a.type="button";a.className="btn ghost small";a.textContent="Nova senha";
+      a.addEventListener("click",async()=>{
+        const p=await ask("Nova senha para "+u.id+" (mínimo 6 caracteres):",true);
+        if(!p)return;
+        if(p.length<6){$("usSt").textContent="A senha precisa ter 6 ou mais caracteres.";return}
+        const salt=newSalt();u.salt=salt;u.hash=await hashPw(p,salt);
+        LS.set("fama_users",users);$("usSt").textContent="Senha de "+u.id+" alterada.";
+      });
+      const d=document.createElement("button");d.type="button";d.className="btn danger small";d.textContent="Excluir";
+      d.addEventListener("click",async()=>{
+        if(!(await ask("Excluir o usuário "+u.id+"?")))return;
+        users=users.filter(x=>x.id!==u.id);LS.set("fama_users",users);drawUsers();
+      });
+      w.append(a,d);r.appendChild(w);
+    }
+    b.appendChild(r);
+  });
+}
+$("usAdd").addEventListener("click",async()=>{
+  const id=uid($("usU").value),p=$("usP").value,st=$("usSt");
+  if(!id){st.textContent="Informe um usuário (letras, números, ponto, hífen).";return}
+  if(p.length<6){st.textContent="A senha precisa ter 6 ou mais caracteres.";return}
+  if(users.some(x=>x.id===id)){st.textContent="Esse usuário já existe.";return}
+  $("usAdd").disabled=true;
+  try{
+    const salt=newSalt();
+    users.push({id,name:$("usN").value.trim()||id,role:"user",salt,hash:await hashPw(p,salt),createdAt:Date.now()});
+    LS.set("fama_users",users);drawUsers();
+    st.textContent="Usuário "+id+" criado. Passe a senha para a pessoa.";$("usU").value="";$("usN").value="";$("usP").value="";
+  }catch(e){st.textContent="Não foi possível criar."}
+  $("usAdd").disabled=false;
+});
+
+function tab(n){["A","B","C","D"].forEach(k=>{$("pane"+k).hidden=k!==n;$("tab"+k).classList.toggle("on",k===n)})}
+$("tabA").onclick=()=>tab("A");$("tabB").onclick=()=>tab("B");$("tabC").onclick=()=>tab("C");$("tabD").onclick=()=>tab("D");
+function fillForm(s){
+  $("sNavy").value=s.navy;$("sAccent").value=s.accent;$("sFont").value=s.font;$("sTheme").value=s.theme;
+  $("sSize").value=s.size;$("sSizeV").textContent=s.size;$("sRadius").value=s.radius;$("sRadiusV").textContent=s.radius;
+  $("sLogo").value=s.logo;$("sName").value=s.name;$("sSub").value=s.sub;$("sH1").value=s.h1;$("sP").value=s.p;$("sFoot").value=s.footer;
+}
+function readForm(){return{navy:$("sNavy").value,accent:$("sAccent").value,font:$("sFont").value,theme:$("sTheme").value,size:+$("sSize").value,radius:+$("sRadius").value,logo:$("sLogo").value.trim()||"▣",name:$("sName").value.trim(),sub:$("sSub").value.trim(),h1:$("sH1").value.trim(),p:$("sP").value.trim(),footer:$("sFoot").value.trim()}}
+["sNavy","sAccent","sFont","sTheme","sSize","sRadius","sLogo","sName","sSub","sH1","sP","sFoot"].forEach(id=>$(id).addEventListener("input",()=>{
+  $("sSizeV").textContent=$("sSize").value;$("sRadiusV").textContent=$("sRadius").value;S={...S,...readForm()};applySettings();
+}));
+function drawCats(){
+  const box=$("catEdit");box.textContent="";
+  draft.forEach((c,i)=>{
+    const r=document.createElement("div");r.className="catrow";
+    const mk=(v,ph,k,cls)=>{const x=document.createElement("input");x.type="text";x.value=v||"";x.placeholder=ph;if(cls)x.className=cls;x.addEventListener("input",()=>{c[k]=x.value});return x};
+    const del=document.createElement("button");del.type="button";del.className="btn danger small";del.textContent="Excluir";
+    del.addEventListener("click",()=>{if(c.id&&!c.isNew)removed.push(c);draft.splice(i,1);drawCats()});
+    r.append(mk(c.icon,"😀","icon"),mk(c.name,"Nome","name"),mk(c.desc,"Descrição","desc","cd"),del);box.appendChild(r);
+  });
+}
+let saved=null;
+$("cfgBtn").addEventListener("click",()=>{
+  saved={...S};fillForm(S);draft=catList().map(c=>({...c,orig:c.name}));removed=[];drawCats();tab("A");$("cStatus").textContent="";$("cfgDlg").showModal();
+});
+$("catAdd").addEventListener("click",()=>{draft.push({id:"c"+Date.now()+Math.random().toString(36).slice(2,5),icon:"📁",name:"",desc:"",isNew:true});drawCats()});
+$("cCancel").addEventListener("click",()=>{S=saved;applySettings();$("cfgDlg").close()});
+$("cfgDlg").addEventListener("cancel",()=>{S=saved;applySettings()});
+$("cReset").addEventListener("click",async()=>{if(!(await ask("Restaurar cores, fonte e textos padrão? As categorias não mudam.")))return;S={...DEF};fillForm(S);applySettings()});
+$("cSave").addEventListener("click",()=>{
+  const st=$("cStatus");st.className="status";
+  if(draft.some(c=>!c.name.trim())){st.textContent="Toda categoria precisa de um nome.";st.className="status err";tab("C");return}
+  const names=draft.map(c=>c.name.trim().toLowerCase());
+  if(new Set(names).size!==names.length){st.textContent="Há categorias com nomes repetidos.";st.className="status err";tab("C");return}
+  S={...S,...readForm()};
+  LS.set("fama_settings",S);
+  cats=draft.map((c,i)=>{
+    const name=c.name.trim();
+    if(c.orig&&c.orig!==name){
+      items.forEach(t=>{if(t.category===c.orig)t.category=name});
+      LS.set("fama_tutorials",items);
+    }
+    return{id:c.id,name,desc:(c.desc||"").trim(),icon:(c.icon||"").trim()||"📁",order:i};
+  });
+  LS.set("fama_categories",cats);
+  applySettings();render();$("cfgDlg").close();
+});
+
+authInit();
+</script>
+</body>
+</html>
