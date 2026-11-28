@@ -48,10 +48,13 @@ dialog{border:1px solid var(--line);border-radius:14px;background:var(--wrapbg);
 dialog::backdrop{background:#000a}
 .dlg{padding:16px}.dlg h3{margin:0 0 12px;font-size:1.15em}
 .dlg label{display:block;font-size:.86em;color:var(--muted);margin:10px 0 4px}
-.dlg input[type=text],.dlg input[type=file],.dlg select,.dlg textarea{width:100%;padding:9px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
+.dlg input[type=text],.dlg input[type=url],.dlg input[type=file],.dlg select,.dlg textarea{width:100%;padding:9px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit}
 .dlg input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:2px}
 .dlg textarea{min-height:70px;resize:vertical}
-.dlg video{width:100%;max-height:60vh;background:#000;border-radius:var(--r)}
+.dlg video,.dlg iframe{width:100%;background:#000;border-radius:var(--r);border:0}
+.dlg video{max-height:60vh}
+.video-frame{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r);background:#000}
+.video-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .tabs .btn{flex:1;min-width:110px}.tabs .on{background:var(--blue);color:#fff;border-color:var(--blue)}
@@ -130,17 +133,20 @@ dialog::backdrop{background:#000a}
 </div></dialog>
 
 <dialog id="uploadDlg"><div class="dlg">
-  <h3>Enviar novo vídeo tutorial</h3>
+  <h3>Adicionar novo vídeo tutorial</h3>
   <label for="uTitle">Título</label><input type="text" id="uTitle" maxlength="120" placeholder="Ex.: Como emitir uma NF-e">
   <label for="uCat">Categoria</label><select id="uCat"></select>
   <label for="uDesc">Descrição (opcional)</label><textarea id="uDesc" maxlength="500"></textarea>
-  <label for="uFile">Vídeo (até 20 MB)</label><input type="file" id="uFile" accept="video/*">
+  <label for="uUrl">Link do vídeo (YouTube ou Google Drive)</label><input type="url" id="uUrl" placeholder="https://www.youtube.com/watch?v=... ou https://drive.google.com/file/d/...">
   <div class="status" id="uStatus"></div>
-  <div class="actions"><button class="btn ghost" id="uCancel" type="button">Cancelar</button><button class="btn" id="uSend" type="button">Enviar</button></div>
+  <div class="actions"><button class="btn ghost" id="uCancel" type="button">Cancelar</button><button class="btn" id="uSend" type="button">Salvar</button></div>
 </div></dialog>
 
 <dialog id="viewDlg"><div class="dlg">
-  <h3 id="vTitle"></h3><video id="vVideo" controls playsinline></video><p id="vDesc" class="status"></p>
+  <h3 id="vTitle"></h3>
+  <div class="video-frame" id="vFrameWrap" hidden><iframe id="vFrame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+  <video id="vVideo" controls playsinline hidden></video>
+  <p id="vDesc" class="status"></p>
   <div class="actions"><button class="btn danger" id="vDel" type="button" hidden>Excluir</button><button class="btn ghost" id="vClose" type="button">Fechar</button></div>
 </div></dialog>
 
@@ -191,101 +197,127 @@ dialog::backdrop{background:#000a}
   <div class="actions"><button class="btn ghost" id="cReset" type="button">Restaurar padrão</button><button class="btn ghost" id="cCancel" type="button">Cancelar</button><button class="btn" id="cSave" type="button">Salvar</button></div>
 </div></dialog>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import {
+  getFirestore,
+  doc as fsDoc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection as fsCol,
+  addDoc,
+  getDocs,
+  query,
+  orderBy as fsOrderBy,
+  limit as fsLimit,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAveplwP25G6au-wMLWXQfsjoep-25tmDM",
+  authDomain: "central-de-tutoriais.firebaseapp.com",
+  projectId: "central-de-tutoriais",
+  storageBucket: "central-de-tutoriais.firebasestorage.app",
+  messagingSenderId: "821712169224",
+  appId: "1:821712169224:web:77308effca3d7dbb8d64bd",
+  measurementId: "G-5YM57E9MQV"
+};
+
+const app = initializeApp(firebaseConfig);
+const firestore = getFirestore(app);
+
 const $=id=>document.getElementById(id);
 const DEF={name:"FAMA INFORMÁTICA",sub:"CENTRAL DE TUTORIAIS",h1:"Aprenda a utilizar seu sistema",p:"Encontre tutoriais e soluções para suas dúvidas.",footer:"Fama Informática • Suporte e treinamento para nossos clientes",logo:"▣",navy:"#15385f",accent:"#1685ed",font:"Arial,Helvetica,sans-serif",size:14,radius:8,theme:"dark"};
 const DEFCATS=[["🖥️","Sistema SCE","Instalação e utilização"],["📄","Notas fiscais","NF-e e NFC-e"],["💾","Backup","Cópias e restauração"],["📦","Cadastros","Produtos e clientes"],["💰","Financeiro","Contas e pagamentos"],["❓","Dúvidas frequentes","Problemas e soluções"]].map((c,i)=>({id:"d"+i,icon:c[0],name:c[1],desc:c[2],order:i,isDefault:true}));
 
-/* Estado da aplicação e adaptador local (usado quando db/assets externos não são injetados) */
-let db=null,assets=null,items=[],cats=[],S={...DEF},selected="",current=null,draft=[],removed=[];
-let me=null,users=[],isMaster=false,userCap=null,setupMode=false,activeBlobUrl="";
-
-const STORE_KEY="fama_tuts_local_v1";
-function readLocal(){
-  try{return JSON.parse(localStorage.getItem(STORE_KEY)||"{}")}catch(e){return {}}
-}
-function writeLocal(patch){
-  try{
-    const cur=readLocal();
-    localStorage.setItem(STORE_KEY,JSON.stringify({...cur,...patch}));
-  }catch(e){}
-}
-function createLocalFallback(){
-  const blobStore=new Map();
-  const listeners={tutorials:new Set(),categories:new Set(),users:new Set()};
-  const notify=(col)=>{
-    const data=readLocal()[col]||{};
-    const arr=Object.entries(data).map(([id,v])=>({id,...v}));
-    listeners[col].forEach(fn=>fn({docs:arr.map(x=>({id:x.id,data:()=>({...x})}))}));
-  };
-  const localDb={
-    doc(path){
-      const [col,id]=path.split("/");
-      return {
-        async get(){
-          if(path==="settings/site"){
-            const s=readLocal().settings;
-            return {exists:!!s,data:()=>s||{}};
-          }
-          const rec=(readLocal()[col]||{})[id];
-          return {exists:!!rec,data:()=>rec||{}};
-        },
-        async set(val){
-          if(path==="settings/site"){writeLocal({settings:val});return;}
-          const all=readLocal();all[col]=all[col]||{};all[col][id]=val;writeLocal({[col]:all[col]});notify(col);
-        },
-        async update(val){
-          const all=readLocal();all[col]=all[col]||{};all[col][id]={...(all[col][id]||{}),...val};writeLocal({[col]:all[col]});notify(col);
-        },
-        async delete(){
-          const all=readLocal();all[col]=all[col]||{};delete all[col][id];writeLocal({[col]:all[col]});notify(col);
-        }
-      };
+/* Adaptador compatível com Firestore para manter toda a estrutura da aplicação */
+function createFirestoreAdapter(){
+  const wrapDoc=(ref)=>({
+    async get(){
+      const snap=await getDoc(ref);
+      return {exists:snap.exists(),data:()=>snap.data()||{}};
     },
-    collection(col){
+    async set(val){
+      await setDoc(ref,val);
+    },
+    async update(val){
+      await updateDoc(ref,val);
+    },
+    async delete(){
+      await deleteDoc(ref);
+    }
+  });
+  return {
+    doc(path){
+      return wrapDoc(fsDoc(firestore,path));
+    },
+    collection(colName){
+      const colRef=fsCol(firestore,colName);
       return {
         async add(val){
-          const id="local_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
-          const all=readLocal();all[col]=all[col]||{};all[col][id]=val;writeLocal({[col]:all[col]});notify(col);
-          return {id};
+          const r=await addDoc(colRef,val);
+          return {id:r.id};
         },
-        doc(id){return localDb.doc(col+"/"+id);},
-        limit(){
+        doc(id){
+          return wrapDoc(fsDoc(firestore,colName,id));
+        },
+        limit(n){
           return {
             async get(){
-              const rec=readLocal()[col]||{};
-              return {size:Object.keys(rec).length};
+              const snap=await getDocs(query(colRef,fsLimit(n)));
+              return {size:snap.size};
             }
           };
         },
         orderBy(field,dir="asc"){
           return {
-            onSnapshot(cb){
-              listeners[col].add(cb);
-              const data=readLocal()[col]||{};
-              const arr=Object.entries(data).map(([id,v])=>({id,...v})).sort((a,b)=>dir==="desc"?(b[field]||0)-(a[field]||0):(a[field]||0)-(b[field]||0));
-              cb({docs:arr.map(x=>({id:x.id,data:()=>({...x})}))});
-              return ()=>listeners[col].delete(cb);
+            onSnapshot(cb,errCb){
+              const q=query(colRef,fsOrderBy(field,dir));
+              return onSnapshot(q,(snap)=>{
+                cb({docs:snap.docs.map(d=>({id:d.id,data:()=>d.data()}))});
+              },errCb);
             }
           };
         }
       };
     }
   };
-  const localAssets={
-    async upload(file){
-      const id="vid_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
-      const url=URL.createObjectURL(file);
-      blobStore.set(id,url);
-      return {id,url};
-    },
-    async delete(id){
-      const u=blobStore.get(id);
-      if(u){URL.revokeObjectURL(u);blobStore.delete(id);}
-    }
-  };
-  return {db:localDb,assets:localAssets};
 }
+
+function extrairMidia(urlRaw){
+  const url=(urlRaw||"").trim();
+  const ytMatch=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  if(ytMatch&&ytMatch[1]){
+    return {provedor:"youtube",midiaId:ytMatch[1],embedUrl:`https://www.youtube.com/embed/${encodeURIComponent(ytMatch[1])}`};
+  }
+  const drivePath=url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/);
+  if(drivePath&&drivePath[1]){
+    return {provedor:"drive",midiaId:drivePath[1],embedUrl:`https://drive.google.com/file/d/${encodeURIComponent(drivePath[1])}/preview`};
+  }
+  const driveQuery=url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  if(url.includes("drive.google.com")&&driveQuery&&driveQuery[1]){
+    return {provedor:"drive",midiaId:driveQuery[1],embedUrl:`https://drive.google.com/file/d/${encodeURIComponent(driveQuery[1])}/preview`};
+  }
+  if(/^https?:\/\/.+\.(mp4|webm|ogg)(\?.*)?$/i.test(url)){
+    return {provedor:"direct",midiaId:"",embedUrl:url};
+  }
+  return null;
+}
+
+const db=createFirestoreAdapter();
+const assets={
+  async upload(urlInput){
+    const m=extrairMidia(urlInput);
+    if(!m)throw new Error("Informe um link válido do YouTube ou do Google Drive.");
+    return {id:m.midiaId,url:m.embedUrl,provedor:m.provedor};
+  },
+  async delete(){return true;}
+};
+
+let items=[],cats=[],S={...DEF},selected="",current=null,draft=[],removed=[];
+let me=null,users=[],isMaster=false,userCap={canEdit:async()=>true},setupMode=false;
 
 function applySettings(){
   const r=document.documentElement.style;
@@ -318,8 +350,7 @@ function render(){
     info.append(s,sm);b.append(p,info);b.addEventListener("click",()=>openView(t));list.appendChild(b);
   });
   const m=$("msg");
-  if(!db){m.textContent="Entre na sua conta para ver os tutoriais publicados.";m.style.display="block"}
-  else if(!shown){m.textContent=items.length?"Nenhum tutorial encontrado. Tente outra pesquisa.":"Ainda não há tutoriais publicados.";m.style.display="block"}
+  if(!shown){m.textContent=items.length?"Nenhum tutorial encontrado. Tente outra pesquisa.":"Ainda não há tutoriais publicados.";m.style.display="block"}
   else m.style.display="none";
 }
 $("search").addEventListener("input",render);
@@ -328,13 +359,26 @@ function openView(t){
   current=t;
   $("vTitle").textContent=t.title;
   $("vDesc").textContent=t.description||"";
-  $("vVideo").src=t.url||"";
-  $("vDel").hidden=!(isMaster&&assets);
+  const m=extrairMidia(t.url);
+  if(m&&m.provedor==="direct"){
+    $("vFrameWrap").hidden=true;
+    $("vFrame").removeAttribute("src");
+    $("vVideo").hidden=false;
+    $("vVideo").src=m.embedUrl;
+  }else{
+    $("vVideo").pause();
+    $("vVideo").removeAttribute("src");
+    $("vVideo").hidden=true;
+    $("vFrameWrap").hidden=false;
+    $("vFrame").src=m?m.embedUrl:(t.url||"");
+  }
+  $("vDel").hidden=!isMaster;
   $("viewDlg").showModal();
 }
 function closeView(){
   $("vVideo").pause();
   $("vVideo").removeAttribute("src");
+  $("vFrame").removeAttribute("src");
   $("viewDlg").close();
   current=null;
 }
@@ -345,26 +389,25 @@ $("vDel").addEventListener("click",async()=>{
   $("vDel").disabled=true;
   try{
     await db.collection("tutorials").doc(current.id).delete();
-    if(current.assetId){try{await assets.delete(current.assetId)}catch(e){}}
     closeView();
   }catch(e){$("vDesc").textContent="Não foi possível excluir."}
   $("vDel").disabled=false;
 });
 
-$("addBtn").addEventListener("click",()=>{$("uStatus").textContent="";$("uStatus").className="status";$("uTitle").value="";$("uDesc").value="";$("uFile").value="";if(selected)$("uCat").value=selected;$("uploadDlg").showModal()});
+$("addBtn").addEventListener("click",()=>{$("uStatus").textContent="";$("uStatus").className="status";$("uTitle").value="";$("uDesc").value="";$("uUrl").value="";if(selected)$("uCat").value=selected;$("uploadDlg").showModal()});
 $("uCancel").addEventListener("click",()=>$("uploadDlg").close());
 $("uSend").addEventListener("click",async()=>{
-  const st=$("uStatus");st.className="status";const title=$("uTitle").value.trim(),f=$("uFile").files[0];
+  const st=$("uStatus");st.className="status";
+  const title=$("uTitle").value.trim(),rawUrl=$("uUrl").value.trim();
   const err=m=>{st.textContent=m;st.className="status err"};
-  if(!title)return err("Informe o título.");if(!f)return err("Escolha um vídeo.");
-  if(!f.type.startsWith("video/"))return err("O arquivo precisa ser um vídeo.");
-  if(f.size>20*1024*1024)return err("O vídeo passa de 20 MB. Comprima ou corte e tente de novo.");
-  $("uSend").disabled=true;st.textContent="Enviando vídeo… aguarde.";
+  if(!title)return err("Informe o título.");
+  if(!rawUrl)return err("Cole o link do vídeo (YouTube ou Google Drive).");
+  $("uSend").disabled=true;st.textContent="Salvando tutorial… aguarde.";
   try{
-    const a=await assets.upload(f);
-    await db.collection("tutorials").add({title,category:$("uCat").value,description:$("uDesc").value.trim(),assetId:a.id,url:a.url,createdAt:Date.now()});
+    const a=await assets.upload(rawUrl);
+    await db.collection("tutorials").add({title,category:$("uCat").value,description:$("uDesc").value.trim(),assetId:a.id,provider:a.provedor,url:a.url,originalUrl:rawUrl,createdAt:Date.now()});
     $("uploadDlg").close();
-  }catch(e){err("Falha no envio"+(e&&e.message?": "+e.message:"."))}
+  }catch(e){err("Falha ao salvar"+(e&&e.message?": "+e.message:"."))}
   $("uSend").disabled=false;
 });
 
@@ -430,7 +473,7 @@ const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
 const newSalt=()=>b64(crypto.getRandomValues(new Uint8Array(16)));
 async function hashPw(pw,salt){const k=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);return b64(await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(atob(salt),c=>c.charCodeAt(0)),iterations:100000,hash:"SHA-256"},k,256))}
 const uid=u=>u.trim().toLowerCase().replace(/[^a-z0-9._-]/g,"");
-async function canWrite(){try{if(userCap&&userCap.canEdit)return !!(await userCap.canEdit())}catch(e){}return !!assets}
+async function canWrite(){try{if(userCap&&userCap.canEdit)return !!(await userCap.canEdit())}catch(e){}return true}
 
 function startData(){
   $("msg").textContent="Carregando tutoriais…";
@@ -651,9 +694,6 @@ $("cSave").addEventListener("click",async()=>{
 applySettings();
 route();
 renderCats();
-const fallback=createLocalFallback();
-if(!db)db=fallback.db;
-if(!assets)assets=fallback.assets;
 authInit();
 </script>
 </body>
